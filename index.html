@@ -429,7 +429,7 @@
   function route(){
     rollDay();
     const h=decodeURIComponent((location.hash||"").slice(1)), q=new URLSearchParams(location.search).get("app");
-    const key=appBy(h)?h:(appBy(q)?q:null);
+    const key=(h==="app")?"app":(appBy(h)?h:(appBy(q)?q:null));
     if(key){
       S.opens[key]=(S.opens[key]||0)+1; save();
       try{history.replaceState(null,"",baseURL()+"#home")}catch(e){}
@@ -460,7 +460,7 @@
 
   // ---------- Popup ----------
   function vPopup(){
-    const a=appBy(view.app), t=view.todo, waiting=view.left>0;
+    const a=appBy(view.app)||{key:"app",name:"Ứng dụng",url:""}, t=view.todo, waiting=view.left>0;
     return `
       ${top()}
       <div class="grow fade">
@@ -472,15 +472,15 @@
              </div>`
            :`<div class="act">Danh sách trống.</div>
              <div class="pills"><button class="pill btn go" style="width:auto;padding:13px 24px" data-go="todos">${IC.plus}Việc muốn làm</button></div>`}
-        <div class="appname">${esc(a.name)} · lần ${S.opens[view.app]||1} hôm nay</div>
+        <div class="appname">${view.app==="app"?`Lần ${S.opens.app||1} hôm nay`:`${esc(a.name)} · lần ${S.opens[view.app]||1} hôm nay`}</div>
       </div>
       <div class="foot">
-        <a id="proceed" style="${S.advanced!==true&&!appBy(view.app).url?"display:none":""}" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
+        <a id="proceed" style="${!a.url?"display:none":""}" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
         <button class="btn sea" data-act="resist">${IC.leafw}Đóng</button>
       </div>`;
   }
   function proceedURL(){
-    const a=appBy(view.app);
+    const a=appBy(view.app)||{key:"app",url:""};
     if(S.advanced!==true) return a.url||"";
     const d=new Date(Date.now()+S.allowance*60000), p2=n=>String(n).padStart(2,"0");
     const until=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
@@ -596,7 +596,11 @@
       ${top("home")}
       <div class="h2">Cài đặt</div>
       <div class="list glass">${step("Cho phép mở","allowance"," phút",1,60)}${step("Chờ trước khi mở","wait"," giây",0,30)}<div class="stepper"><span style="font-weight:600">Âm thanh</span><button class="tog ${S.sound!==false?"on":""}" data-act="sound" aria-label="Bật tắt âm thanh"></button></div></div>
-      <div class="card glass"><h3>Cài cho mỗi app (1 tác vụ)</h3><ol>
+      <div class="card glass"><h3>Cách gọn nhất: 1 tự động hoá cho nhiều app</h3><ol>
+        <li>Phím tắt → <b>Tự động hoá</b> → <b>+</b> → <b>Ứng dụng</b> → <b>Chọn</b> → tick tất cả app muốn chặn</li>
+        <li><b>Được mở</b> → chọn kiểu chạy → Tiếp → <b>Tự động hoá trống mới</b></li>
+        <li>Thêm <b>Mở URL</b> → dán link dưới</li></ol>${cp(base+"#app","c0")}</div>
+      <div class="card glass"><h3>Hoặc từng app (hiện tên app + nút Vẫn mở)</h3><ol>
         <li>Phím tắt → <b>Tự động hoá</b> → <b>+</b> → <b>Ứng dụng</b></li>
         <li>Chọn app (vd. YouTube) → tick <b>Được mở</b> → <b>Chạy sau khi xác nhận</b> → Tiếp</li>
         <li><b>Tự động hoá trống mới</b> → thêm <b>Mở URL</b> → dán link dưới, thêm mã app ở cuối</li>
