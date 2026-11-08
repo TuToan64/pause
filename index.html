@@ -479,7 +479,7 @@
         <div class="appname">${view.app==="app"?`Lần ${S.opens.app||1} hôm nay`:`${esc(a.name)} · lần ${S.opens[view.app]||1} hôm nay`}</div>
       </div>
       <div class="foot">
-        <a id="proceed" style="${!a.url?"display:none":""}" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
+        <a id="proceed" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
         <button class="btn sea" data-act="resist">${IC.leafw}Đóng</button>
       </div>`;
   }
@@ -501,6 +501,11 @@
     },1000);
   }
 
+  function vStay(){
+    return `${top()}<div class="grow fade"><div class="try">Được thôi.</div><div class="act">Vuốt khung này <span class="di">xuống</span></div>
+      <p class="appname" style="margin-top:18px">để quay lại app · ${S.allowance} phút thôi nhé</p></div>
+      <div class="foot"><button class="btn gl glass" data-go="home">Về trang chủ PAUSE.</button></div>`;
+  }
   function vNice(){
     setTimeout(()=>{ if(view.name==="nice") go({name:"home"}) },2000);
     return `${top()}<div class="grow fade"><div class="act">Ok.</div></div>`;
@@ -626,7 +631,7 @@
 
   // ---------- Render ----------
   function render(){
-    const V={home:vHome,popup:vPopup,nice:vNice,session:vSession,todos:vTodos,apps:vApps,setup:vSetup};
+    const V={stay:vStay,home:vHome,popup:vPopup,nice:vNice,session:vSession,todos:vTodos,apps:vApps,setup:vSetup};
     if(view.name==="session"&&!S.session) view={name:"home"};
     $app.innerHTML=(V[view.name]||vHome)();
     if(view.name==="popup") countdown();
@@ -645,6 +650,7 @@
     const t=e.target.closest("[data-go],[data-act],[data-start],[data-mins],[data-deltodo],[data-togapp],[data-delapp],[data-step],[data-copy],#proceed");
     if(!t) return;
     if(t.id==="proceed"){ e.preventDefault(); if(view.left>0) return; S.today.proceeded++; save();
+      if(!t.getAttribute("href")){ setTimeout(()=>go({name:"stay"}),320); return; }
       const href=t.getAttribute("href"); setTimeout(()=>{ location.href=href; },450); setTimeout(()=>go({name:"home"}),1400); return; }
     if(t.dataset.copy){ act(t); return; }
     setTimeout(()=>act(t),320);
@@ -662,7 +668,9 @@
       try{navigator.clipboard.writeText(txt).then(()=>{t.textContent="Đã copy";setTimeout(()=>t.textContent="Copy",1500)}).catch(()=>t.textContent="Giữ để copy")}catch(_){t.textContent="Giữ để copy"} return; }
     switch(d.act){
       case "another": view.todo=randomTodo(view.todo&&view.todo.id); render(); break;
-      case "resist": S.today.resisted++; markWin(); save(); go({name:"nice"}); break;
+      case "resist": S.today.resisted++; markWin(); save(); go({name:"nice"});
+        if(location.protocol==="https:"){ const out="x-safari-"+baseURL()+"#home"; setTimeout(()=>{ location.href=out; },900); }
+        break;
       case "preview": setBg(); go(popup(S.apps[1]?S.apps[1].key:S.apps[0].key)); break;
       case "finish": { if(celeb) stopCelebrate(); else flourish(); const s=S.session, mins=Math.round((Math.min(Date.now(),s.end)-s.start)/60000);
         rollDay(); S.today.minutes+=mins; S.total+=mins; const td=S.todos.find(x=>x.id===s.todo.id); if(td) td.last=Date.now();
