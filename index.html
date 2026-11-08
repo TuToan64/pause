@@ -687,7 +687,6 @@
     switch(d.act){
       case "another": view.todo=randomTodo(view.todo&&view.todo.id); render(); break;
       case "resist": S.today.resisted++; markWin(); save(); go({name:"nice"});
-        if(location.protocol==="https:"&&view.app!=="pause"&&view.app!=="app"){ const out="x-safari-"+baseURL()+"#home"; setTimeout(()=>{ location.href=out; },900); }
         break;
       case "preview": setBg(); go(popup(S.apps[1]?S.apps[1].key:S.apps[0].key)); break;
       case "finish": { if(celeb) stopCelebrate(); else flourish(); const s=S.session, mins=Math.round((Math.min(Date.now(),s.end)-s.start)/60000);
