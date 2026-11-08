@@ -475,12 +475,13 @@
         <div class="appname">${esc(a.name)} · lần ${S.opens[view.app]||1} hôm nay</div>
       </div>
       <div class="foot">
-        <a id="proceed" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
+        <a id="proceed" style="${S.advanced!==true&&!appBy(view.app).url?"display:none":""}" class="btn gl glass ${waiting?"off":""}" href="${proceedURL()}">${IC.open}<span id="ptxt">${waiting?`Vẫn mở (${view.left}s)`:"Vẫn mở"}</span></a>
         <button class="btn sea" data-act="resist">${IC.leafw}Đóng</button>
       </div>`;
   }
   function proceedURL(){
     const a=appBy(view.app);
+    if(S.advanced!==true) return a.url||"";
     const d=new Date(Date.now()+S.allowance*60000), p2=n=>String(n).padStart(2,"0");
     const until=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
     let u="shortcuts://x-callback-url/run-shortcut?name="+encodeURIComponent("PAUSE Mo")+"&input=text&text="+encodeURIComponent(until);
@@ -595,17 +596,20 @@
       ${top("home")}
       <div class="h2">Cài đặt</div>
       <div class="list glass">${step("Cho phép mở","allowance"," phút",1,60)}${step("Chờ trước khi mở","wait"," giây",0,30)}<div class="stepper"><span style="font-weight:600">Âm thanh</span><button class="tog ${S.sound!==false?"on":""}" data-act="sound" aria-label="Bật tắt âm thanh"></button></div></div>
-      <div class="card glass"><h3>1 · Phím tắt “PAUSE”</h3><ol>
-        <li><b>Lấy tệp</b> · thư mục Phím tắt · <code>pause.txt</code> · tắt “Báo lỗi nếu không tìm thấy”</li>
+      <div class="card glass"><h3>Cài cho mỗi app (1 tác vụ)</h3><ol>
+        <li>Phím tắt → <b>Tự động hoá</b> → <b>+</b> → <b>Ứng dụng</b></li>
+        <li>Chọn app (vd. YouTube) → tick <b>Được mở</b> → <b>Chạy sau khi xác nhận</b> → Tiếp</li>
+        <li><b>Tự động hoá trống mới</b> → thêm <b>Mở URL</b> → dán link dưới, thêm mã app ở cuối</li>
+        <li>Mã các app: ${keys||"—"}</li></ol>${cp(base+"#youtube","c1")}</div>
+      <div class="stepper glass" style="border-radius:22px;margin-top:12px"><span style="font-weight:600">Chế độ nâng cao<br><span class="p" style="font-size:12px;color:var(--soft)">Dùng phím tắt PAUSE &amp; PAUSE Mo</span></span><button class="tog ${S.advanced===true?"on":""}" data-act="advanced" aria-label="Chế độ nâng cao"></button></div>
+      ${S.advanced===true?`<div class="card glass"><h3>Phím tắt “PAUSE”</h3><ol>
+        <li><b>Lấy tệp</b> · thư mục Phím tắt · <code>pause.txt</code> · tắt báo lỗi</li>
         <li><b>Lấy ngày từ đầu vào</b></li>
         <li><b>Nếu</b> Ngày <i>sau</i> Ngày hiện tại → <b>Dừng phím tắt này</b></li>
-        <li><b>Mở URL</b>: địa chỉ dưới + [Đầu vào phím tắt]</li></ol>${cp(base+"#","c1")}</div>
-      <div class="card glass"><h3>2 · Phím tắt “PAUSE Mo”</h3><ol>
-        <li><b>Lưu tệp</b> · [Đầu vào phím tắt] · tắt “Hỏi vị trí lưu” · <code>pause.txt</code> · bật “Ghi đè”</li></ol></div>
-      <div class="card glass"><h3>3 · Tự động hoá cho mỗi app</h3><ol>
-        <li>Tự động hoá → + → Ứng dụng → chọn app → <b>Được mở</b> → <b>Chạy ngay lập tức</b></li>
-        <li><b>Văn bản</b> [mã app] → <b>Chạy phím tắt</b> PAUSE</li>
-        <li>Mã các app đang chặn: ${keys||"—"}</li></ol></div>
+        <li><b>Mở URL</b>: địa chỉ trang + # + [Đầu vào phím tắt]</li></ol></div>
+      <div class="card glass"><h3>Phím tắt “PAUSE Mo”</h3><ol>
+        <li><b>Lưu tệp</b> · [Đầu vào phím tắt] · tắt hỏi vị trí · <code>pause.txt</code> · ghi đè</li></ol>
+        <p class="p" style="margin-top:6px">Tự động hoá mỗi app: <b>Chạy ngay lập tức</b> → Văn bản [mã app] → Chạy phím tắt PAUSE</p></div>`:""}
       <p class="hint">“Vẫn mở” cho phép dùng mọi app bị chặn trong số phút đã chọn. App tự thêm không có link mở sẵn: hãy tự mở lại app đó.</p>
       <p class="credit">Ảnh nền: Birger Strahl / <a href="https://unsplash.com/photos/bmjp_dwpoU8">Unsplash</a> ·
         Brocken Inaglory / <a href="https://commons.wikimedia.org/wiki/File:Total_internal_reflection_of_Chelonia_mydas.jpg">Wikimedia Commons</a>, CC BY-SA ·
@@ -656,6 +660,7 @@
         rollDay(); S.today.minutes+=mins; S.total+=mins; const td=S.todos.find(x=>x.id===s.todo.id); if(td) td.last=Date.now();
         S.session=null; save(); go({name:"home"}); break; }
       case "cancel": stopCelebrate(); S.session=null; save(); go({name:"home"}); break;
+      case "advanced": S.advanced=!(S.advanced===true); save(); render(); break;
       case "sound": S.sound=(S.sound===false); save(); render(); if(S.sound!==false){ initAudio(); actx&&actx.resume(); } break;
     }
   }
