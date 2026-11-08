@@ -486,7 +486,8 @@
   }
   function proceedURL(){
     const a=appBy(view.app)||{key:view.app,url:""};
-    if(view.app==="pause"){
+    if(view.app==="pause") return "";
+    if(false){
       const d=new Date(Date.now()+S.allowance*60000), p2=n=>String(n).padStart(2,"0");
       const until=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
       return "shortcuts://run-shortcut?name="+encodeURIComponent("PAUSE Mo")+"&input=text&text="+encodeURIComponent(until);
@@ -514,12 +515,13 @@
   }
   function vStay(){
     return `${top()}<div class="grow fade"><div class="try">Được thôi.</div><div class="act">Vuốt khung này <span class="di">xuống</span></div>
-      <p class="appname" style="margin-top:18px">để quay lại app · ${S.allowance} phút thôi nhé</p></div>
+      <p class="appname" style="margin-top:18px">hoặc bấm ✕ ở góc trên · 5 phút thôi nhé</p></div>
       <div class="foot"><button class="btn gl glass" data-go="home">Về trang chủ PAUSE.</button></div>`;
   }
   function vNice(){
-    setTimeout(()=>{ if(view.name==="nice") go({name:"home"}) },2000);
-    return `${top()}<div class="grow fade"><div class="act">Ok.</div></div>`;
+    return `${top()}<div class="grow fade"><div class="act">Ok.</div>
+      <p class="appname" style="margin-top:18px">Vuốt lên để về màn hình chính và đi làm việc khác nhé</p></div>
+      <div class="foot"><button class="btn gl glass" data-go="home">Về trang chủ PAUSE.</button></div>`;
   }
 
   // ---------- Đếm giờ ----------
@@ -666,7 +668,7 @@
     if(!t) return;
     if(t.id==="proceed"){ e.preventDefault(); if(view.left>0) return; S.today.proceeded++; save();
       if(!t.getAttribute("href")){ setTimeout(()=>go({name:"stay"}),320); return; }
-      if(view.app==="pause"){ const href=t.getAttribute("href"); setTimeout(()=>{ location.href=href; },450); setTimeout(()=>go({name:"back"}),900); return; }
+
       const href=t.getAttribute("href"); setTimeout(()=>{ location.href=href; },450); setTimeout(()=>go({name:"home"}),1400); return; }
     if(t.dataset.copy){ act(t); return; }
     setTimeout(()=>act(t),320);
@@ -685,7 +687,7 @@
     switch(d.act){
       case "another": view.todo=randomTodo(view.todo&&view.todo.id); render(); break;
       case "resist": S.today.resisted++; markWin(); save(); go({name:"nice"});
-        if(location.protocol==="https:"){ const out="x-safari-"+baseURL()+"#home"; setTimeout(()=>{ location.href=out; },900); }
+        if(location.protocol==="https:"&&view.app!=="pause"&&view.app!=="app"){ const out="x-safari-"+baseURL()+"#home"; setTimeout(()=>{ location.href=out; },900); }
         break;
       case "preview": setBg(); go(popup(S.apps[1]?S.apps[1].key:S.apps[0].key)); break;
       case "finish": { if(celeb) stopCelebrate(); else flourish(); const s=S.session, mins=Math.round((Math.min(Date.now(),s.end)-s.start)/60000);
