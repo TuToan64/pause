@@ -261,6 +261,11 @@
   .links button{font-size:12px;font-weight:300}
   .card h3{font-weight:500;font-size:15px}
   .card ol,.hint,.p{font-family:"Segoe UI",-apple-system,sans-serif}
+
+  /* câu mời lớn hơn, không còn quả cầu */
+  .try{font-size:clamp(20px,6vw,26px)!important;font-weight:300!important;margin-bottom:4px}
+  .act{font-size:clamp(34px,10.5vw,48px)!important;line-height:1.18!important;font-weight:500!important}
+  .pills{margin-top:34px}
 </style>
 </head>
 <body>
@@ -464,7 +469,6 @@
     return `
       ${top()}
       <div class="grow fade">
-        <div class="orb glass">${leaf}</div>
         ${t?`<div class="try">Hay là thử</div>
              <div class="act">${esc(lowerFirst(t.title))} <span class="di">đi?</span></div>
              <div class="pills">
@@ -499,7 +503,7 @@
 
   function vNice(){
     setTimeout(()=>{ if(view.name==="nice") go({name:"home"}) },2000);
-    return `${top()}<div class="grow fade"><div class="orb glass">${leaf}</div><div class="act">Ok.</div></div>`;
+    return `${top()}<div class="grow fade"><div class="act">Ok.</div></div>`;
   }
 
   // ---------- Đếm giờ ----------
