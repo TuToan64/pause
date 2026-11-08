@@ -481,7 +481,11 @@
   }
   function proceedURL(){
     const a=appBy(view.app);
-    return "shortcuts://run-shortcut?name="+encodeURIComponent("PAUSE Mo")+"&input=text&text="+encodeURIComponent(JSON.stringify({app:a.key,min:S.allowance,url:a.url||""}));
+    const d=new Date(Date.now()+S.allowance*60000), p2=n=>String(n).padStart(2,"0");
+    const until=d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
+    let u="shortcuts://x-callback-url/run-shortcut?name="+encodeURIComponent("PAUSE Mo")+"&input=text&text="+encodeURIComponent(until);
+    if(a.url) u+="&x-success="+encodeURIComponent(a.url);
+    return u;
   }
   function countdown(){
     clearInterval(timer); if(view.left<=0) return;
@@ -591,21 +595,18 @@
       ${top("home")}
       <div class="h2">Cài đặt</div>
       <div class="list glass">${step("Cho phép mở","allowance"," phút",1,60)}${step("Chờ trước khi mở","wait"," giây",0,30)}<div class="stepper"><span style="font-weight:600">Âm thanh</span><button class="tog ${S.sound!==false?"on":""}" data-act="sound" aria-label="Bật tắt âm thanh"></button></div></div>
-      <div class="card glass"><h3>A · Phím tắt “PAUSE Kiem tra”</h3><ol>
-        <li><b>Lấy tệp</b> từ thư mục Phím tắt: <code>PAUSE/</code>[Đầu vào]<code>.txt</code> — tắt báo lỗi</li>
+      <div class="card glass"><h3>1 · Phím tắt “PAUSE”</h3><ol>
+        <li><b>Lấy tệp</b> · thư mục Phím tắt · <code>pause.txt</code> · tắt “Báo lỗi nếu không tìm thấy”</li>
         <li><b>Lấy ngày từ đầu vào</b></li>
-        <li><b>Nếu</b> Ngày <i>sau</i> Ngày hiện tại → <b>Dừng phím tắt</b></li>
-        <li><b>Mở URL</b>: địa chỉ dưới + [Đầu vào]</li></ol>${cp(base+"#","c1")}</div>
-      <div class="card glass"><h3>B · Phím tắt “PAUSE Mo”</h3><ol>
-        <li><b>Lấy từ điển từ đầu vào</b></li>
-        <li><code>min</code> → <b>Điều chỉnh ngày</b> + phút → <b>Định dạng ngày</b> ISO 8601</li>
-        <li><code>app</code> → <b>Lưu tệp</b> <code>PAUSE/</code>[app]<code>.txt</code>, ghi đè</li>
-        <li><code>url</code> → <b>Mở URL</b></li></ol></div>
-      <div class="card glass"><h3>C · Tự động hoá cho mỗi app</h3><ol>
-        <li>Tự động hoá → Ứng dụng → <b>Được mở</b> → <b>Chạy ngay</b></li>
-        <li><b>Văn bản</b> [mã app] → <b>Chạy phím tắt</b> PAUSE Kiem tra</li>
+        <li><b>Nếu</b> Ngày <i>sau</i> Ngày hiện tại → <b>Dừng phím tắt này</b></li>
+        <li><b>Mở URL</b>: địa chỉ dưới + [Đầu vào phím tắt]</li></ol>${cp(base+"#","c1")}</div>
+      <div class="card glass"><h3>2 · Phím tắt “PAUSE Mo”</h3><ol>
+        <li><b>Lưu tệp</b> · [Đầu vào phím tắt] · tắt “Hỏi vị trí lưu” · <code>pause.txt</code> · bật “Ghi đè”</li></ol></div>
+      <div class="card glass"><h3>3 · Tự động hoá cho mỗi app</h3><ol>
+        <li>Tự động hoá → + → Ứng dụng → chọn app → <b>Được mở</b> → <b>Chạy ngay lập tức</b></li>
+        <li><b>Văn bản</b> [mã app] → <b>Chạy phím tắt</b> PAUSE</li>
         <li>Mã các app đang chặn: ${keys||"—"}</li></ol></div>
-      <p class="hint">App tự thêm không có link mở sẵn: sau khi “Vẫn mở”, hãy tự mở lại app đó.</p>
+      <p class="hint">“Vẫn mở” cho phép dùng mọi app bị chặn trong số phút đã chọn. App tự thêm không có link mở sẵn: hãy tự mở lại app đó.</p>
       <p class="credit">Ảnh nền: Birger Strahl / <a href="https://unsplash.com/photos/bmjp_dwpoU8">Unsplash</a> ·
         Brocken Inaglory / <a href="https://commons.wikimedia.org/wiki/File:Total_internal_reflection_of_Chelonia_mydas.jpg">Wikimedia Commons</a>, CC BY-SA ·
         W.carter / <a href="https://commons.wikimedia.org/wiki/File:Underside_of_expanded_bluefire_jellyfish_in_Brofjorden_at_Sandvik_57.jpg">Wikimedia Commons</a>, CC BY-SA 4.0</p>`;
